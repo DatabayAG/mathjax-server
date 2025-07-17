@@ -1,34 +1,12 @@
 /**
- * Adapted from simple/tex2svg-page and simple
+ * Server for rendering latex expressions
+ * Adapted from https://github.com/mathjax/MathJax-demos-node/blob/master/simple/tex2svg
  * run with: node -r esm service.js
  */
 
-  // Configuration for rendering a whole page
-const page_config = {
-    loader: {
-      load: ['adaptors/liteDOM', 'tex-svg']
-    },
-    tex: {
-      packages: ['base', 'autoload', 'require', 'ams', 'newcommand'],
-      inlineMath: [
-        ['[tex]', '[/tex]'],
-        ['\\(', '\\)']],
-      displayMath: [
-        ['\\[', '\\]']],
-    },
-    svg: {
-      fontCache: 'global',
-      exFactor: 8 / 16    // ex / em
-    },
-    'adaptors/liteDOM': {
-      fontSize:  16
-    },
-    startup: {
-      document: '<html><head></head><body>[tex]e*m*c^2[/tex]</body></html>'
-    }
-  };
-
-// Configuration for rendering simgle latex expressions
+/**
+ * Configuration for rendering single latex expressions
+ */
 const math_config = {
   options: {
     enableAssistiveMml: false
@@ -44,9 +22,9 @@ const math_config = {
   },
 };
 
-//
-//  Minimal CSS needed for stand-alone image, see component/tex2svg
-//
+/**
+ *  Minimal CSS needed for stand-alone image, see component/tex2svg
+ */
 const math_css = [
   'svg a{fill:blue;stroke:blue}',
   '[data-mml-node="merror"]>g{fill:red;stroke:red}',
@@ -75,14 +53,8 @@ const server = http.createServer(async (request, response) =>
     try {
       const post = JSON.parse(body);
       let output = 'Unknown request';
-
-      console.log(post);
-
       if (post.math) {
         output = await renderMath(math_config, post);
-      }
-      else if (post.page) {
-        output = await renderPage(page_config, post);
       }
 
       response.statusCode = 200;
@@ -117,43 +89,3 @@ async function renderMath(config, post) {
     return html.replace(/<defs>/, `<defs><style>${math_css}</style>`);
   });
 }
-
-/**
- * Render all latex expressions on a page
- * PROBLEM: does work with simpe pages but not with ILIAS pages
- */
-async function renderPage(config, post) {
-  let config_with_page = config;
-  config_with_page.startup.document = post.page;
-
-  const MathJax = await require('mathjax-full').init(config_with_page);
-  if (!MathJax) {
-    return post.page;
-  }
-
-  const adaptor = MathJax.startup.adaptor;
-  const html = MathJax.startup.document;
-  if (Array.from(html.math).length === 0) {
-    adaptor.remove(html.outputJax.svgStyles);
-    const cache = adaptor.elementById(adaptor.body(html.document), 'MJX-SVG-global-cache');
-    if (cache) adaptor.remove(cache);
-  }
-
-  // MathJax adds html head and body to the content
-  // Generaed CSS style is put to the header
-  // If not called for an entire page, extract and deliver them witout html and body tags
-  let output = '';
-  if (post.full_page) {
-    output =
-      adaptor.doctype(html.document)
-      + adaptor.outerHTML(adaptor.root(html.document));
-  }
-  else {
-    output =
-      adaptor.innerHTML(adaptor.head(html.document))
-      + adaptor.innerHTML(adaptor.body(html.document));
-  }
-
-  return output;
-}
-

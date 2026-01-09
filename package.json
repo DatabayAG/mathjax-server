@@ -1,13 +1,12 @@
 {
   "name": "mathjax-server",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Server for MathXax Processing",
   "main": "service.js",
   "author": "Fred Neumann",
   "license": "",
   "homepage": "https://gitlab.databay.de/Ilias-Plugins/mathjax-server",
   "dependencies": {
-    "esm": "^3.2.25",
-    "mathjax-full": "^3.2.0"
+    "mathjax": "^3.2.2"
   }
 }

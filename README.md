@@ -5,20 +5,23 @@ This server can be configured as Third Party tool in ILIAS 9 an 10.
 
 ## Direct Installation on a Server
 
+This has been tested with node v22.21.0
+
 Create a user account that should be used for running the server:
 ````
 useradd -rm mathjax
 ````
 
-Log in as that user and clone this repository. Go to the cloned directory and install the mathjax dependency:
+Log in as that user and clone this repository. Move to the cloned directory and install the dependencies:
+````
+git clone https://github.com/DatabayAG/mathjax-server.git
+cd mathjax-server
+npm clean-install --no-scripts
+````
 
+Run the service:
 ````
-npm install
-````
-
-To run the service go to the cloned directory an execute:
-````
-node -r esm service.js
+node service.js
 ````
 
 It should show you this message:
@@ -33,6 +36,8 @@ You should put this service behind a reverse proxy to call it with https from ou
 Log in as a user that is able to build and run docker images.  Clone this repository. Go to the cloned repository and build the container:
 
 ````
+git clone https://github.com/DatabayAG/mathjax-server.git
+cd mathjax-server
 docker build -t mathjax-server .
 ````
 
@@ -51,5 +56,3 @@ The service should then be available on port 8003 of your docker host. You shoul
 * Enter the "Server Address" of the mathjax server
 * Choose for which purposes you want to use the server
 * Save the settings and check if the "Test expression" is rendered
-
-

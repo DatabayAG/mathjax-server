@@ -8,14 +8,8 @@
  * Configuration for rendering single latex expressions
  */
 const math_config = {
-  options: {
-    enableAssistiveMml: false
-  },
   loader: {
-    load: ['adaptors/liteDOM', 'tex-svg']
-  },
-  tex: {
-    packages: ['base', 'autoload', 'require', 'ams', 'newcommand'],
+    load: ['input/tex', 'output/svg']
   },
   svg: {
     fontCache: 'none',    // fonts must be in every single svg
@@ -77,15 +71,9 @@ server.listen(port, () => {
  * Render a single latex expression
  */
 async function renderMath(config, post) {
-  const MathJax = await require('mathjax-full').init(config);
-  return await MathJax.tex2svgPromise(post.math, {
-    // display: false,             // false to process as inline math
-    // em: 16,                     // em-size in pixels
-    // ex: 8,                      // ex-size in pixels
-    // containerWidth: 80 * 16     //width of container in pixels
-  }).then((node) => {
-    const adaptor = MathJax.startup.adaptor;
-    const html = adaptor.innerHTML(node);
-    return html.replace(/<defs>/, `<defs><style>${math_css}</style>`);
-  });
+  const MathJax = await require('mathjax').init(config);
+  const svg = MathJax.tex2svg(post.math);
+  const adaptor = MathJax.startup.adaptor;
+  const html = adaptor.innerHTML(svg);
+  return html.replace(/<defs>/, `<defs><style>${math_css}</style>`)
 }

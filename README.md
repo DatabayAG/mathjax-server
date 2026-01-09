@@ -3,31 +3,6 @@
 A node.js base HTTP wrapper for MathJax 3 to create SVG images for LaTeX expressions.
 This server can be configured as Third Party tool in ILIAS 9 an 10.
 
-## Direct Installation on a Server
-
-Create a user account that should be used for running the server:
-````
-useradd -rm mathjax
-````
-
-Log in as that user and clone this repository. Go to the cloned directory and install the mathjax dependency:
-
-````
-npm install
-````
-
-To run the service go to the cloned directory an execute:
-````
-node -r esm service.js
-````
-
-It should show you this message:
-````
-Server running on port 8003
-````
-
-You should put this service behind a reverse proxy to call it with https from outside.
-
 ## Installation as a Docker Container
 
 Log in as a user that is able to build and run docker images.  Clone this repository. Go to the cloned repository and build the container:

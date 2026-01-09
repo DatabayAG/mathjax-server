@@ -6,7 +6,7 @@ USER mathjax
 WORKDIR /home/mathjax
 COPY --chown=mathjax:mathjax . .
 
-RUN npm install
+RUN npm clean-install --no-script
 
 EXPOSE 8003
 CMD node -r esm service.js

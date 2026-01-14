@@ -9,11 +9,13 @@ This has been tested with node v22.21.0
 
 Create a user account that should be used for running the server:
 ````
-useradd -rm mathjax
+useradd -rm -d /opt/mathjax mathjax
 ````
 
-Log in as that user and clone this repository. Move to the cloned directory and install the dependencies:
+Switch to that user and clone this repository. Move to the cloned directory and install the dependencies:
 ````
+su mathjax
+cd /opt/mathjax
 git clone https://github.com/DatabayAG/mathjax-server.git
 cd mathjax-server
 npm clean-install --no-scripts
@@ -30,6 +32,36 @@ Server running on port 8003
 ````
 
 You should put this service behind a reverse proxy to call it with https from outside.
+
+### Run as a systemd service
+
+Create a service description file `/etc/systemd/system/mathjax.service`
+
+````
+[Unit]
+Description=Node.js Mathjax Server
+
+[Service]
+Environment=NODE_PORT=8003
+User=mathjax
+ExecStart=/usr/bin/node /opt/mathjax/mathjax-server/service.js
+# Required on some systems
+#WorkingDirectory=/opt/mathjax/mathjax-server
+Restart=always
+# Restart service after 10 seconds if node service crashes
+RestartSec=10
+SyslogIdentifier=nodejs-mathjax
+
+[Install]
+WantedBy=multi-user.target
+````
+
+Enable and start the service:
+
+````
+systemctl enable mathjax.service
+systemctl start mathjax.service 
+````
 
 ## Installation as a Docker Container
 
